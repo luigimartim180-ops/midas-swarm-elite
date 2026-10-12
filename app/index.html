@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estação de Treino Auditivo — pt-BR</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #111111;
+    --muted: #5a5a5a;
+    --line: #d8d8d8;
+    --accent: #1a5fb4;
+    --accent-soft: #e8f0fb;
+    --ok: #1a7f37;
+    --ok-soft: #e6f4ea;
+    --warn: #9a6700;
+    --warn-soft: #fdf3d8;
+    --err: #b42318;
+    --err-soft: #fdecea;
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #121212;
+      --fg: #f2f2f2;
+      --muted: #b5b5b5;
+      --line: #3a3a3a;
+      --accent: #7cb0ff;
+      --accent-soft: #17233a;
+      --ok: #6ddc8a;
+      --ok-soft: #14261a;
+      --warn: #f0c869;
+      --warn-soft: #2a2213;
+      --err: #ff8f85;
+      --err-soft: #2c1614;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 19px;
+    line-height: 1.55;
+  }
+  main { max-width: 820px; margin: 0 auto; padding: 20px 18px 60px; }
+  h1 { font-size: 1.5rem; margin: 0 0 6px; }
+  h2 { font-size: 1.15rem; margin: 26px 0 10px; }
+  p.lead { color: var(--muted); margin: 0 0 18px; }
+  .card {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin: 16px 0;
+    background: var(--bg);
+  }
+  .card.warn { background: var(--warn-soft); border-color: var(--warn); }
+  .card.ok { background: var(--ok-soft); border-color: var(--ok); }
+  .card.err { background: var(--err-soft); border-color: var(--err); }
+  .steps { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 4px; }
+  .step {
+    font-size: 0.82rem;
+    padding: 5px 11px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    color: var(--muted);
+  }
+  .step.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+  .step.done { background: var(--ok-soft); color: var(--ok); border-color: var(--ok); }
+  label.field { display: block; font-weight: 600; margin: 14px 0 6px; }
+  .row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  input[type=range] { flex: 1; min-width: 220px; height: 34px; }
+  button {
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--fg);
+    border-radius: 12px;
+    padding: 14px 18px;
+    min-height: 56px;
+  }
+  button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  button.big { width: 100%; font-size: 1.1rem; }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  @media (max-width: 560px) { .grid3 { grid-template-columns: 1fr; } }
+  .hidden { display: none !important; }
+  .badge { display: inline-block; font-size: 0.85rem; padding: 3px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+  .num { font-variant-numeric: tabular-nums; font-weight: 700; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); font-size: 0.95rem; }
+  .opt { font-size: 1.05rem; }
+  .feedback { margin-top: 12px; font-weight: 600; }
+  .foot { color: var(--muted); font-size: 0.86rem; margin-top: 26px; }
+  .kv { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--line); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Estação de Treino Auditivo</h1>
+  <p class="lead">Treino de fala em ruído e resolução temporal, em português do Brasil, para uso domiciliar acompanhado.</p>
+
+  <div class="steps" id="steps">
+    <span class="step" data-step="0">1. Calibrar volume</span>
+    <span class="step" data-step="1">2. Fala em ruído</span>
+    <span class="step" data-step="2">3. Resolução temporal</span>
+    <span class="step" data-step="4">4. Resultados</span>
+    <span class="step" data-step="5">5. Protocolo</span>
+  </div>
+
+  <div class="card warn">
+    <strong>Antes de começar</strong>
+    <p style="margin:8px 0 0">Use fones de ouvido em ambiente silencioso. Isto é uma ferramenta de treino e triagem orientativa, não um exame clínico calibrado. A voz é sintética e mais fácil que a voz humana real. Nada aqui substitui audiometria e avaliação profissional.</p>
+  </div>
+
+  <!-- STEP 0 -->
+  <section id="s0" class="card">
+    <h2>Passo 1 — Calibrar o volume</h2>
+    <p>Ajuste até ouvir o barulho de fundo de forma confortável: claramente audível, mas sem incomodar.</p>
+    <div class="row">
+      <button id="btnNoise" class="primary">Tocar barulho</button>
+      <span class="badge">Ruído rosa</span>
+    </div>
+    <label class="field" for="vol">Volume do barulho</label>
+    <div class="row">
+      <input id="vol" type="range" min="0" max="100" value="30">
+      <span class="num" id="volVal">30</span>
+    </div>
+    <label class="field">Testar a voz</label>
+    <button id="btnVoice">Ouvir uma frase de teste</button>
+    <p id="voiceMsg" class="feedback"></p>
+    <button id="toStep1" class="primary big" style="margin-top:18px">Ir para o teste de fala em ruído</button>
+  </section>
+
+  <!-- STEP 1 -->
+  <section id="s1" class="card hidden">
+    <h2>Passo 2 — Fala em ruído</h2>
+    <p>Ouça a frase e escolha a resposta. São <span class="num">10</span> frases, do mais fácil ao mais difícil. O ruído começa antes da voz.</p>
+    <div class="row">
+      <button id="playSIN" class="primary">Ouvir frase</button>
+      <span class="badge" id="sinProgress">Frase 0 de 10</span>
+      <span class="badge" id="sinSNR">SNR +8 dB</span>
+    </div>
+    <div id="sinOptions" class="grid3" style="margin-top:16px"></div>
+    <p id="sinFeedback" class="feedback"></p>
+  </section>
+
+  <!-- STEP 2 -->
+  <section id="s2" class="card hidden">
+    <h2>Passo 3 — Resolução temporal</h2>
+    <p>Você vai ouvir um ou dois sons. Se ouvir <strong>dois</strong>, aperte "Dois sons". Se ouvir <strong>um só</strong>, aperte "Um som".</p>
+    <div class="row">
+      <button id="playGap" class="primary">Tocar som</button>
+      <span class="badge" id="gapProgress">Tentativa 0</span>
+    </div>
+    <div class="grid2" style="margin-top:16px">
+      <button id="gapOne" class="opt">Um som</button>
+      <button id="gapTwo" class="opt">Dois sons</button>
+    </div>
+    <p id="gapFeedback" class="feedback"></p>
+  </section>
+
+  <!-- STEP 4 -->
+  <section id="s4" class="card hidden">
+    <h2>Resultados</h2>
+    <div id="results"></div>
+    <button id="copyResults" class="primary big" style="margin-top:18px">Copiar resultados</button>
+    <button id="toProfile" class="big" style="margin-top:10px">Gerar protocolo personalizado</button>
+    <button id="again" style="margin-top:10px" class="big">Refazer os testes</button>
+  </section>
+
+  <!-- STEP 5 -->
+  <section id="s5" class="card hidden">
+    <h2>Protocolo personalizado</h2>
+    <p>Responda as perguntas de calibragem. O protocolo é gerado no próprio aparelho, sem servidor, a partir do mesmo motor auditável do repositório.</p>
+    <div id="profileForm"></div>
+    <button id="buildProtocol" class="primary big" style="margin-top:16px">Gerar protocolo</button>
+    <div id="protocolOut" style="margin-top:16px"></div>
+  </section>
+
+  <p class="foot" id="foot"></p>
+</main>
+
+<script src="protocol.js"></script>
+<script>
+"use strict";
+
+/* ---------------- audio engine ---------------- */
+let ctx = null;
+let noiseSrc = null;
+let noiseGain = null;
+let noiseBuffer = null;
+
+function ensureCtx() {
+  if (ctx) return ctx;
+  const AC = window.AudioContext || window.webkitAudioContext;
+  ctx = new AC();
+  noiseBuffer = makePinkNoise(ctx, 4);
+  return ctx;
+}
+
+function makePinkNoise(ac, seconds) {
+  const len = Math.floor(ac.sampleRate * seconds);
+  const buf = ac.createBuffer(1, len, ac.sampleRate);
+  const data = buf.getChannelData(0);
+  let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+  for (let i = 0; i < len; i++) {
+    const white = Math.random() * 2 - 1;
+    b0 = 0.99886 * b0 + white * 0.0555179;
+    b1 = 0.99332 * b1 + white * 0.0750759;
+    b2 = 0.96900 * b2 + white * 0.1538520;
+    b3 = 0.86650 * b3 + white * 0.3104856;
+    b4 = 0.55000 * b4 + white * 0.5329522;
+    b5 = -0.7616 * b5 - white * 0.0168980;
+    data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+    b6 = white * 0.115926;
+  }
+  return buf;
+}
+
+/* Noise level is expressed relative to the calibrated reference (0 dB). */
+function noiseGainFor(relDb) {
+  const calib = Number(vol.value) / 100;      // 0..1 user calibration
+  const base = 0.0001 + calib * 0.5;          // keep it audible but bounded
+  return base * Math.pow(10, relDb / 20);
+}
+
+function startNoise(relDb) {
+  const ac = ensureCtx();
+  if (ac.state === "suspended") ac.resume();
+  stopNoise();
+  noiseSrc = ac.createBufferSource();
+  noiseSrc.buffer = noiseBuffer;
+  noiseSrc.loop = true;
+  noiseGain = ac.createGain();
+  noiseGain.gain.value = noiseGainFor(relDb);
+  noiseSrc.connect(noiseGain).connect(ac.destination);
+  noiseSrc.start();
+}
+
+function stopNoise() {
+  if (noiseSrc) { try { noiseSrc.stop(); } catch (e) {} noiseSrc = null; }
+}
+
+function speak(text, rate) {
+  return new Promise((resolve) => {
+    if (!("speechSynthesis" in window)) { resolve(); return; }
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "pt-BR";
+    u.rate = rate || 0.95;
+    u.volume = 1;
+    const v = pickVoice();
+    if (v) u.voice = v;
+    u.onend = () => resolve();
+    u.onerror = () => resolve();
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(u);
+  });
+}
+
+function pickVoice() {
+  const voices = window.speechSynthesis.getVoices() || [];
+  return voices.find(v => (v.lang || "").toLowerCase().startsWith("pt-br"))
+      || voices.find(v => (v.lang || "").toLowerCase().startsWith("pt"))
+      || null;
+}
+if ("speechSynthesis" in window) {
+  window.speechSynthesis.onvoiceschanged = () => { pickVoice(); };
+}
+
+function playTonePair(gapMs) {
+  const ac = ensureCtx();
+  if (ac.state === "suspended") ac.resume();
+  const t0 = ac.currentTime + 0.05;
+  const toneDur = 0.25;
+  const gap = gapMs / 1000;
+  playTone(t0, toneDur, ac);
+  if (gapMs > 0) playTone(t0 + toneDur + gap, toneDur, ac);
+}
+
+function playTone(startAt, dur, ac) {
+  const osc = ac.createOscillator();
+  const g = ac.createGain();
+  osc.type = "sine";
+  osc.frequency.value = 500;
+  g.gain.setValueAtTime(0, startAt);
+  g.gain.linearRampToValueAtTime(0.28, startAt + 0.02);
+  g.gain.setValueAtTime(0.28, startAt + dur - 0.02);
+  g.gain.linearRampToValueAtTime(0, startAt + dur);
+  osc.connect(g).connect(ac.destination);
+  osc.start(startAt);
+  osc.stop(startAt + dur + 0.02);
+}
+
+/* ---------------- sentence bank (pt-BR) ---------------- */
+const SENTENCES = [
+  { s: "O neto do seu Joaquim chega no sábado à tarde.", q: "Quando o neto chega?", a: "sábado à tarde", d: ["domingo de manhã", "sexta à noite"] },
+  { s: "Dona Marta comprou pão, leite e ovos na padaria.", q: "O que ela comprou?", a: "pão, leite e ovos", d: ["arroz, feijão e café", "frutas e verduras"] },
+  { s: "O médico pediu para tomar o remédio depois do almoço.", q: "Quando tomar o remédio?", a: "depois do almoço", d: ["antes do café", "na hora de dormir"] },
+  { s: "O ônibus das cinco horas vai para o centro da cidade.", q: "Para onde vai o ônibus?", a: "para o centro", d: ["para a praia", "para o aeroporto"] },
+  { s: "A neta ligou para avisar que vai jantar aqui domingo.", q: "O que a neta avisou?", a: "que vai jantar aqui domingo", d: ["que vai viajar sábado", "que chegou de viagem"] },
+  { s: "O vizinho do lado esquerdo vendeu o carro antigo.", q: "O que o vizinho vendeu?", a: "o carro antigo", d: ["a moto nova", "a bicicleta"] },
+  { s: "A farmácia entrega o pedido na quarta-feira de manhã.", q: "Quando chega o pedido?", a: "quarta de manhã", d: ["quinta à tarde", "terça à noite"] },
+  { s: "O jardim ganhou rosas vermelhas no mês de agosto.", q: "O que o jardim ganhou?", a: "rosas vermelhas", d: ["flores amarelas", "plantas de sombra"] },
+  { s: "O gato subiu no telhado depois que a chuva parou.", q: "Quando o gato subiu?", a: "depois que a chuva parou", d: ["antes do almoço", "durante a chuva"] },
+  { s: "A conta de luz chegou mais alta neste mês de inverno.", q: "O que chegou mais alto?", a: "a conta de luz", d: ["o aluguel", "a conta de água"] },
+  { s: "O mecânico consertou o freio do carro antes do almoço.", q: "O que foi consertado?", a: "o freio do carro", d: ["o motor da moto", "o pneu da bicicleta"] },
+  { s: "O carteiro deixou uma encomenda na portaria hoje cedo.", q: "Onde deixou a encomenda?", a: "na portaria", d: ["na cozinha", "no quintal"] }
+];
+
+/* SNR levels relative to the calibrated noise reference (lower = harder). */
+const SIN_LEVELS = [8, 8, 4, 4, 0, 0, -4, -4, -8, -8];
+
+/* ---------------- UI helpers ---------------- */
+const vol = document.getElementById("vol");
+const volVal = document.getElementById("volVal");
+vol.addEventListener("input", () => { volVal.textContent = vol.value; });
+
+function show(id) {
+  ["s0", "s1", "s2", "s4", "s5"].forEach(s => document.getElementById(s).classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
+}
+function setStep(n) {
+  document.querySelectorAll(".step").forEach(el => {
+    const k = Number(el.dataset.step);
+    el.classList.toggle("active", k === n);
+    el.classList.toggle("done", k < n);
+  });
+}
+
+/* ---------------- step 0: calibration ---------------- */
+let noiseOn = false;
+document.getElementById("btnNoise").addEventListener("click", () => {
+  if (noiseOn) { stopNoise(); noiseOn = false; document.getElementById("btnNoise").textContent = "Tocar barulho"; }
+  else { startNoise(0); noiseOn = true; document.getElementById("btnNoise").textContent = "Parar barulho"; }
+});
+document.getElementById("btnVoice").addEventListener("click", async () => {
+  await speak("Esta é uma frase de teste em português do Brasil.", 0.95);
+});
+document.getElementById("toStep1").addEventListener("click", () => {
+  stopNoise(); noiseOn = false;
+  document.getElementById("btnNoise").textContent = "Tocar barulho";
+  show("s1"); setStep(1); startSIN();
+});
+
+/* ---------------- step 1: speech in noise ---------------- */
+let sinIdx = 0;
+let sinScore = [];       // per-level correct count
+let sinLevelCount = [];
+let sinOrder = [];
+let sinAnswered = false;
+let current = null;
+
+function shuffle(a) {
+  const r = a.slice();
+  for (let i = r.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [r[i], r[j]] = [r[j], r[i]];
+  }
+  return r;
+}
+
+function startSIN() {
+  sinIdx = 0;
+  sinOrder = shuffle(SENTENCES).slice(0, 10);
+  sinScore = SIN_LEVELS.map(() => 0);
+  sinLevelCount = SIN_LEVELS.map(() => 0);
+  document.getElementById("sinFeedback").textContent = "";
+  renderSINTrial();
+}
+
+function renderSINTrial() {
+  sinAnswered = false;
+  document.getElementById("sinProgress").textContent = "Frase " + (sinIdx + 1) + " de 10";
+  const snr = SIN_LEVELS[sinIdx];
+  document.getElementById("sinSNR").textContent = "SNR " + (snr > 0 ? "+" : "") + snr + " dB";
+  current = sinOrder[sinIdx];
+  const box = document.getElementById("sinOptions");
+  box.innerHTML = "";
+  const opts = shuffle([current.a, ...current.d]);
+  opts.forEach(text => {
+    const b = document.createElement("button");
+    b.className = "opt";
+    b.textContent = text;
+    b.addEventListener("click", () => answerSIN(text, b));
+    box.appendChild(b);
+  });
+  document.getElementById("playSIN").disabled = false;
+  document.getElementById("sinFeedback").textContent = "";
+}
+
+document.getElementById("playSIN").addEventListener("click", async () => {
+  const snr = SIN_LEVELS[sinIdx];
+  startNoise(snr);
+  await new Promise(r => setTimeout(r, 600));
+  await speak(current.s, 0.95);
+  await new Promise(r => setTimeout(r, 350));
+  stopNoise();
+});
+
+function answerSIN(text, btn) {
+  if (sinAnswered) return;
+  sinAnswered = true;
+  const snr = SIN_LEVELS[sinIdx];
+  const correct = text === current.a;
+  sinLevelCount[sinIdx] += 1;
+  if (correct) sinScore[sinIdx] += 1;
+  const fb = document.getElementById("sinFeedback");
+  fb.textContent = correct ? "Acertou." : ("Não foi essa. A resposta era: " + current.a);
+  fb.style.color = correct ? "var(--ok)" : "var(--err)";
+  document.querySelectorAll("#sinOptions button").forEach(b => b.disabled = true);
+  btn.style.borderColor = correct ? "var(--ok)" : "var(--err)";
+  setTimeout(() => {
+    sinIdx += 1;
+    if (sinIdx >= 10) { finishSIN(); } else { renderSINTrial(); }
+  }, 1400);
+}
+
+function estimateSNR50() {
+  // Proportion correct per SNR level; interpolate the 50% crossing.
+  const levels = [...new Set(SIN_LEVELS)].sort((a, b) => b - a); // easy -> hard
+  const prop = {};
+  levels.forEach(l => {
+    let c = 0, n = 0;
+    SIN_LEVELS.forEach((lv, i) => { if (lv === l) { c += sinScore[i]; n += sinLevelCount[i]; } });
+    prop[l] = n ? c / n : 0;
+  });
+  for (let i = 0; i < levels.length; i++) {
+    if (prop[levels[i]] < 0.5) {
+      if (i === 0) return { value: levels[0] + 4, censored: "harder" };
+      const hi = levels[i - 1], lo = levels[i];
+      const phi = prop[hi], plo = prop[lo];
+      const frac = (phi - 0.5) / (phi - plo || 1);
+      return { value: hi + (lo - hi) * frac, censored: null };
+    }
+  }
+  return { value: levels[levels.length - 1] - 4, censored: "easier" };
+}
+
+let sinResult = null;
+function finishSIN() {
+  sinResult = estimateSNR50();
+  show("s2"); setStep(2); startGap();
+}
+
+/* ---------------- step 2: gap detection ---------------- */
+const GAPS = [40, 30, 20, 15, 10, 7, 5, 3];
+let gapIdx = 0;
+let gapTrials = 0;
+let gapCorrectStreak = 0;
+let gapReversals = [];
+let gapLastDir = 0;
+let gapIsTwo = true;
+let gapAnswered = false;
+
+function startGap() {
+  gapIdx = 0; gapTrials = 0; gapCorrectStreak = 0; gapReversals = []; gapLastDir = 0;
+  document.getElementById("gapFeedback").textContent = "";
+  renderGapTrial();
+}
+
+function renderGapTrial() {
+  gapAnswered = false;
+  document.getElementById("gapProgress").textContent = "Tentativa " + (gapTrials + 1);
+  document.getElementById("gapFeedback").textContent = "";
+  // Present a two-tone pair when the gap is audible; single tone as catch trial.
+  gapIsTwo = true;
+}
+
+document.getElementById("playGap").addEventListener("click", () => {
+  playTonePair(GAPS[gapIdx]);
+});
+
+document.getElementById("gapOne").addEventListener("click", () => answerGap(false));
+document.getElementById("gapTwo").addEventListener("click", () => answerGap(true));
+
+function answerGap(saidTwo) {
+  if (gapAnswered) return;
+  gapAnswered = true;
+  gapTrials += 1;
+  const correct = (saidTwo === gapIsTwo);
+  const fb = document.getElementById("gapFeedback");
+  fb.textContent = correct ? "Certo." : "Errado.";
+  fb.style.color = correct ? "var(--ok)" : "var(--err)";
+
+  let dir;
+  if (correct) {
+    gapCorrectStreak += 1;
+    dir = 0;
+    if (gapCorrectStreak >= 2) { dir = 1; gapCorrectStreak = 0; }   // go harder
+  } else {
+    gapCorrectStreak = 0;
+    dir = -1;                                                       // go easier
+  }
+  if (dir !== 0) {
+    if (gapLastDir !== 0 && dir !== gapLastDir) gapReversals.push(GAPS[gapIdx]);
+    gapLastDir = dir;
+    gapIdx = Math.max(0, Math.min(GAPS.length - 1, gapIdx + dir));
+  }
+
+  const done = gapReversals.length >= 6 || gapTrials >= 20;
+  setTimeout(() => {
+    if (done) finishGap(); else renderGapTrial();
+  }, 900);
+}
+
+let gapResult = null;
+function finishGap() {
+  const rev = gapReversals.length ? gapReversals : [GAPS[gapIdx]];
+  // Geometric mean of reversal gaps (standard threshold estimate).
+  const mean = rev.reduce((acc, v) => acc + Math.log(v), 0) / rev.length;
+  gapResult = Math.exp(mean);
+  finishAll();
+}
+
+/* ---------------- results ---------------- */
+function bandSNR(v) {
+  if (v <= 2) return { label: "dentro do esperado para audição normal", cls: "ok" };
+  if (v <= 7) return { label: "redução leve", cls: "warn" };
+  if (v <= 15) return { label: "redução moderada", cls: "warn" };
+  return { label: "redução importante", cls: "err" };
+}
+function bandGap(v) {
+  if (v <= 8) return { label: "boa", cls: "ok" };
+  if (v <= 20) return { label: "moderada", cls: "warn" };
+  return { label: "atenção", cls: "err" };
+}
+
+let summaryText = "";
+function finishAll() {
+  setStep(4); show("s4");
+  const snr = sinResult.value;
+  const bs = bandSNR(snr);
+  const bg = bandGap(gapResult);
+  const el = document.getElementById("results");
+  el.innerHTML = "";
+  const rows = [
+    ["Fala em ruído (estimativa de SNR loss)", (snr > 0 ? "+" : "") + snr.toFixed(1) + " dB", bs.label, bs.cls],
+    ["Resolução temporal (gap)", gapResult.toFixed(1) + " ms", bg.label, bg.cls]
+  ];
+  const card = document.createElement("div");
+  card.className = "card";
+  let html = "<table><thead><tr><th>Medida</th><th>Valor</th><th>Faixa</th></tr></thead><tbody>";
+  rows.forEach(r => {
+    html += "<tr><td>" + r[0] + "</td><td class='num'>" + r[1] + "</td><td>" + r[2] + "</td></tr>";
+  });
+  html += "</tbody></table>";
+  html += "<p style='margin-top:14px;color:var(--muted)'>Referência: SNR loss 0 dB é normal; adultos com perda auditiva costumam ficar entre 2,6 e 10 dB. Gap detection acima de 20 ms sugere dificuldade de resolução temporal.</p>";
+  card.innerHTML = html;
+  el.appendChild(card);
+
+  summaryText =
+    "Resultados do teste auditivo domiciliar: " +
+    "fala em ruído SNR loss ≈ " + (snr > 0 ? "+" : "") + snr.toFixed(1) + " dB (" + bs.label + "); " +
+    "resolução temporal (gap) ≈ " + gapResult.toFixed(1) + " ms (" + bg.label + "). " +
+    "Teste orientativo, não clínico.";
+  document.getElementById("copyResults").disabled = false;
+}
+
+document.getElementById("copyResults").addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText(summaryText);
+    document.getElementById("copyResults").textContent = "Resultados copiados";
+  } catch (e) {
+    window.prompt("Copie os resultados:", summaryText);
+  }
+  setTimeout(() => { document.getElementById("copyResults").textContent = "Copiar resultados"; }, 2000);
+});
+
+document.getElementById("again").addEventListener("click", () => {
+  stopNoise();
+  show("s0"); setStep(0);
+});
+
+/* ---------------- step 5: personalisation (offline, deterministic) ---------------- */
+const PROFILE_FIELDS = [
+  { id: "hearing_aid", label: "Marca e modelo dos aparelhos", type: "text", value: "" },
+  { id: "hearing_aid_streaming", label: "Os aparelhos já transmitem áudio da TV?", type: "select", options: ["none", "bluetooth", "tv_adapter", "remote_mic", "unknown"], value: "unknown" },
+  { id: "tv_setup", label: "Como é a TV da casa?", type: "select", options: ["smart_tv", "cable_box", "old_tv", "streaming_stick", "unknown"], value: "unknown" },
+  { id: "tv_can_configure", label: "Alguém consegue configurar a TV hoje?", type: "bool", value: true },
+  { id: "favourite_program", label: "Programa favorito", type: "text", value: "" },
+  { id: "favourite_time", label: "Horário em que costuma assistir", type: "text", value: "" },
+  { id: "living", label: "Com quem mora?", type: "select", options: ["alone", "with_family", "care_facility"], value: "with_family" },
+  { id: "caregiver_hours_per_day", label: "Horas por dia com cuidador por perto", type: "number", value: 4 },
+  { id: "top_complaints", label: "Principais queixas (segure Ctrl para várias)", type: "multi", options: ["tv", "noise", "group", "phone", "quick_speech", "female_voice", "fatigue"], value: ["tv"] },
+  { id: "medications_ototoxic", label: "Usa medicamentos que podem afetar audição/equilíbrio?", type: "bool", value: false },
+  { id: "walk_minutes_per_day", label: "Minutos de caminhada por dia", type: "number", value: 20 },
+  { id: "uses_captions", label: "Costuma usar legenda?", type: "bool", value: false },
+  { id: "tinnitus", label: "Tem zumbido?", type: "bool", value: false },
+  { id: "falls_last_year", label: "Quedas no último ano", type: "number", value: 0 },
+  { id: "cognitive_impairment", label: "Diagnóstico de declínio cognitivo?", type: "bool", value: false }
+];
+
+const COMPLAINT_PT = {
+  tv: "TV", noise: "ruído", group: "grupo", phone: "telefone",
+  quick_speech: "fala rápida", female_voice: "voz feminina", fatigue: "cansaço"
+};
+const TV_PT = {
+  news_anchor: "telejornal", interview: "entrevista",
+  soap_opera_with_questions: "novela com perguntas", film_with_music: "filme com música"
+};
+const FOCUS_PT = {
+  "signal + first win": "sinal + primeira vitória",
+  "establish the routine": "estabelecer a rotina",
+  "add difficulty": "aumentar a dificuldade",
+  "first re-test": "primeira reavaliação",
+  "temporal resolution": "resolução temporal",
+  "real-world transfer": "transferência para a vida real",
+  "consolidation": "consolidação",
+  "final re-test and maintenance": "reavaliação final e manutenção"
+};
+
+function renderProfileForm() {
+  const box = document.getElementById("profileForm");
+  box.innerHTML = "";
+  PROFILE_FIELDS.forEach(f => {
+    const wrap = document.createElement("div");
+    const lab = document.createElement("label");
+    lab.className = "field";
+    lab.textContent = f.label;
+    lab.htmlFor = "pf_" + f.id;
+    wrap.appendChild(lab);
+    let input;
+    if (f.type === "select") {
+      input = document.createElement("select");
+      input.id = "pf_" + f.id;
+      f.options.forEach(o => {
+        const op = document.createElement("option");
+        op.value = o; op.textContent = o;
+        if (o === f.value) op.selected = true;
+        input.appendChild(op);
+      });
+      input.style.cssText = "width:100%;padding:12px;font:inherit;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--fg)";
+    } else if (f.type === "multi") {
+      input = document.createElement("select");
+      input.id = "pf_" + f.id;
+      input.multiple = true;
+      f.options.forEach(o => {
+        const op = document.createElement("option");
+        op.value = o; op.textContent = COMPLAINT_PT[o] || o;
+        if (f.value.includes(o)) op.selected = true;
+        input.appendChild(op);
+      });
+      input.style.cssText = "width:100%;padding:12px;font:inherit;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--fg);min-height:130px";
+    } else if (f.type === "bool") {
+      input = document.createElement("select");
+      input.id = "pf_" + f.id;
+      [["true", "Sim"], ["false", "Não"]].forEach(([v, t]) => {
+        const op = document.createElement("option");
+        op.value = v; op.textContent = t;
+        if ((f.value ? "true" : "false") === v) op.selected = true;
+        input.appendChild(op);
+      });
+      input.style.cssText = "width:100%;padding:12px;font:inherit;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--fg)";
+    } else {
+      input = document.createElement("input");
+      input.id = "pf_" + f.id;
+      input.type = f.type === "number" ? "number" : "text";
+      input.value = f.value;
+      input.style.cssText = "width:100%;padding:12px;font:inherit;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--fg)";
+    }
+    wrap.appendChild(input);
+    box.appendChild(wrap);
+  });
+}
+
+document.getElementById("toProfile").addEventListener("click", () => {
+  renderProfileForm();
+  setStep(5); show("s5");
+});
+
+function readProfile() {
+  const p = {};
+  PROFILE_FIELDS.forEach(f => {
+    const el = document.getElementById("pf_" + f.id);
+    if (f.type === "number") p[f.id] = Number(el.value || 0);
+    else if (f.type === "bool") p[f.id] = el.value === "true";
+    else if (f.type === "multi") p[f.id] = Array.from(el.selectedOptions).map(o => o.value);
+    else p[f.id] = el.value;
+  });
+  return p;
+}
+
+document.getElementById("buildProtocol").addEventListener("click", () => {
+  const p = readProfile();
+  const out = document.getElementById("protocolOut");
+  if (!p.top_complaints || !p.top_complaints.length) {
+    out.innerHTML = "<div class='card err'>Escolha pelo menos uma queixa.</div>";
+    return;
+  }
+  let protocol;
+  try {
+    protocol = window.SwarmEngine.buildProtocol(p);
+  } catch (e) {
+    out.innerHTML = "<div class='card err'>Não foi possível gerar o protocolo: " + e.message + "</div>";
+    return;
+  }
+  out.innerHTML = "";
+  protocol.agents.forEach(a => {
+    const card = document.createElement("div");
+    card.className = "card";
+    let html = "<h2>" + a.agent + "</h2><p style='color:var(--muted);margin:0 0 10px'>" + a.objective + "</p>";
+    if (a.actions) {
+      a.actions.forEach(act => {
+        html += "<div class='kv'><div><strong>" + act.action + "</strong><br><span style='color:var(--muted)'>" + act.detail + "</span></div></div>";
+      });
+    }
+    if (a.micro_sessions_per_day) {
+      html += "<div class='kv'><span>Sessões por dia</span><span class='num'>" + a.micro_sessions_per_day + "</span></div>";
+      html += "<div class='kv'><span>Minutos por sessão</span><span class='num'>" + a.minutes_per_session + "</span></div>";
+      html += "<div class='kv'><span>Dias por semana</span><span class='num'>" + a.days_per_week + "</span></div>";
+      html += "<div class='kv'><span>Platô esperado</span><span class='num'>" + a.expected_plateau_weeks + " semanas</span></div>";
+    }
+    if (a.tv_ladder) {
+      html += "<div class='kv'><span>Escada de TV</span><span>" + a.tv_ladder.map(t => TV_PT[t] || t).join(" → ") + "</span></div>";
+      html += "<div class='kv'><span>Música</span><span>" + a.music.minutes_per_session + " min, " + a.music.sessions_per_week + "x/semana</span></div>";
+    }
+    if (a.rules) html += "<ul>" + a.rules.map(r => "<li>" + r + "</li>").join("") + "</ul>";
+    if (a.escalation_rules) html += "<ul>" + a.escalation_rules.map(r => "<li>" + r + "</li>").join("") + "</ul>";
+    if (a.flags && a.flags.length) {
+      html += "<div class='card warn'><strong>Alertas</strong><ul>" + a.flags.map(f => "<li>" + f.flag + ": " + f.action + "</li>").join("") + "</ul></div>";
+    }
+    card.innerHTML = html;
+    out.appendChild(card);
+  });
+
+  const planCard = document.createElement("div");
+  planCard.className = "card";
+  let ph = "<h2>Plano de 8 semanas</h2><table><thead><tr><th>Semana</th><th>Foco</th><th>Conteúdo de TV</th></tr></thead><tbody>";
+  protocol.plan.forEach(w => {
+    ph += "<tr><td class='num'>" + w.week + "</td><td>" + (FOCUS_PT[w.focus] || w.focus) + "</td><td>" + (TV_PT[w.tv_content] || w.tv_content) + "</td></tr>";
+  });
+  ph += "</tbody></table>";
+  planCard.innerHTML = ph;
+  out.appendChild(planCard);
+
+  const refCard = document.createElement("div");
+  refCard.className = "card";
+  refCard.innerHTML = "<h2>Referências</h2><p style='color:var(--muted)'>" + protocol.references.length + " fontes no registro de evidências: " + protocol.references.join(", ") + "</p>";
+  out.appendChild(refCard);
+
+  out.scrollIntoView({ behavior: "smooth" });
+});
+
+document.getElementById("foot").textContent =
+  "Base científica: QuickSIN e HHIE-S (referência), Humes 2014 (dosagem), Zheng 2024 (reabilitação), Tye-Murray 2016 (parceiro de comunicação).";
+
+/* Preview hook: ?demo=1 jumps to results with representative values, ?demo=2
+   also opens the personalisation form. Used for manual QA and demos. */
+(function () {
+  const demo = new URLSearchParams(location.search).get("demo");
+  if (!demo) return;
+  sinResult = { value: 6.3, censored: null };
+  gapResult = 12.0;
+  finishAll();
+  if (demo === "2") {
+    renderProfileForm();
+    setStep(5); show("s5");
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "hearing_aid": "Phonak Audeo P50",
+  "hearing_aid_streaming": "none",
+  "tv_setup": "smart_tv",
+  "tv_can_configure": true,
+  "favourite_program": "novela das nove",
+  "favourite_time": "21h",
+  "living": "with_family",
+  "caregiver_hours_per_day": 4,
+  "top_complaints": ["tv", "noise", "group"],
+  "medications_ototoxic": false,
+  "walk_minutes_per_day": 20,
+  "uses_captions": true,
+  "tinnitus": false,
+  "falls_last_year": 0,
+  "cognitive_impairment": false
+}
