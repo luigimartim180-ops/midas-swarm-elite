@@ -239,6 +239,51 @@ EVIDENCE: dict[str, dict[str, Any]] = {
         "url": "https://blog.chsc.org/blog/how-clear-speech-helps-those-with-hearing-loss",
         "grade": "D",
     },
+    "phone_streaming_2024": {
+        "claim": (
+            "Streaming phone calls directly to hearing aids improved word "
+            "recognition during noisy phone calls and reduced self-reported "
+            "listening effort in adults with moderate-to-severe hearing loss."
+        ),
+        "effect": "word recognition 30.0 -> 39.1 of 50; listening effort 85.5 -> 72.5 of 100",
+        "citation": "Journal of Audiology and Otology. 2024, summarised in Audiology Northwest: hearing aids and Bluetooth.",
+        "url": "https://www.audiologynw.com/blog/hearing-aids-and-bluetooth",
+        "grade": "B",
+    },
+    "bluetooth_coupling_2024": {
+        "claim": (
+            "Bluetooth coupling of the hearing aid to the audio source improves "
+            "speech recognition especially when speech is time-compressed, and is "
+            "rated higher in quality even in quiet."
+        ),
+        "effect": "significant gain at 40% compression (t(1,19)=3.942, p=0.001); no gain at normal rate",
+        "citation": "Bluetooth Coupling in Hearing Aids: Effect on Audiovisual Speech Recognition in Older Individuals with Sloping Hearing Loss. 2023.",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10147467",
+        "grade": "B",
+    },
+    "tv_streaming_muted_mics_2024": {
+        "claim": (
+            "In background noise, TV streaming with the hearing-aid microphones "
+            "muted produced better speech understanding and satisfaction than "
+            "standard hearing-aid listening; in quiet the benefit was small."
+        ),
+        "effect": "benefit concentrated in noise when hearing-aid microphones are muted",
+        "citation": "Plyler PN, et al. Effectiveness of Television Streaming on Hearing Aid User Performance. American Journal of Audiology. 2024.",
+        "url": "https://pubs.asha.org/doi/abs/10.1044/2023_AJA-23-00169",
+        "grade": "B",
+    },
+    "repair_strategies_ace": {
+        "claim": (
+            "Structured communication training such as Active Communication "
+            "Education increases the use of communication repair strategies, "
+            "improves acceptance of hearing loss and yields gains in quality of "
+            "life and social relationships."
+        ),
+        "effect": "more repair strategies used; better acceptance and quality of life in RCTs of communication training",
+        "citation": "Active Communication Education RCTs, summarised in Practical Communication Strategies for People with Hearing Loss. HearingTracker.",
+        "url": "https://www.hearingtracker.com/resources/7-practical-communication-strategies-for-people-with-hearing-loss",
+        "grade": "B",
+    },
 }
 
 

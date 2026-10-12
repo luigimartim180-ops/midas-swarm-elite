@@ -22,11 +22,20 @@ Cada agente é uma política determinística. `refs` é a lista de chaves de evi
 
 | Agente | Objetivo | Gatilhos | Saída | Critério de parada |
 |---|---|---|---|---|
-| **A1 — SignalChainAgent** | Maximizar a relação sinal-ruído antes de qualquer treino | `streaming = none/unknown`, queixa `noise`/`group`, `tv_can_configure`, `medications_ototoxic` | lista de ações de dispositivo e ambiente | streaming configurado e verificado no dia 1 |
-| **A2 — DosageAgent** | Atingir a janela terapêutica sem fadiga auditiva | sempre; reduz dose se `cognitive_impairment` | sessões/dia, minutos, dias/semana, regra de encerramento | platô em 5–7,5 semanas |
-| **A3 — TransferAgent** | Levar o ganho para TV, telefone e conversa | sempre; ajusta legenda se `uses_captions` | escada de TV, dose de música, ingredientes ativos | acompanhar novela sem legenda |
-| **A4 — PartnerAgent** | Aumentar a inteligibilidade mudando quem fala | `living`, `caregiver_hours_per_day` | modo (doméstico/remoto/equipe) + regras de fala clara | parceiro treinado |
-| **A5 — SafetyAgent** | Nunca deixar a reabilitação atrasar cuidado médico | `falls_last_year`, `tinnitus`, `medications_ototoxic` | alertas e regras de escalonamento | red flag encaminhada |
+| **A1 — SignalChainAgent** | Maximizar a relação sinal-ruído antes de qualquer treino | `streaming = none/unknown`, queixa `noise`/`group`/`phone`, `tv_can_configure`, `medications_ototoxic` | 6 gatilhos T1.x → ações priorizadas (P1–P5) com efeito esperado, esforço e faixa de custo | streaming configurado e verificado no dia 1 |
+| **A2 — DosageAgent** | Atingir a janela terapêutica sem fadiga auditiva | sempre; reduz dose se `cognitive_impairment`; assento se `falls`; controle de fadiga | 4 gatilhos T2.x → dose + estrutura de sessão, progressão, sinais de fadiga, regras de parada, adesão alvo | platô em 5–7,5 semanas |
+| **A3 — TransferAgent** | Levar o ganho para TV, telefone e conversa | sempre; ajusta legenda se `uses_captions`; escadas de telefone/conversa por queixa | 5 gatilhos T3.x → 3 escadas com alvos por degrau, dose de música, checagem semanal | acompanhar novela sem legenda |
+| **A4 — PartnerAgent** | Aumentar a inteligibilidade mudando quem fala | `living`, `caregiver_hours_per_day` | 4 gatilhos T4.x → modo, script, regras faça/não faça, treino de 20 min, frases de reparo, checklist de ambiente | parceiro treinado |
+| **A5 — SafetyAgent** | Nunca deixar a reabilitação atrasar cuidado médico | `falls_last_year`, `tinnitus`, `medications_ototoxic` | 4 gatilhos T5.x → red flags com urgência, encaminhamentos, contraindicações, teto declarado | red flag encaminhada |
+
+Cada agente também declara as suas **lacunas de evidência** (`evidence_gaps`): o que a
+ciência ainda não resolve. Um agente que afirma saber tudo está mentindo — declarar a
+lacuna é parte do contrato.
+
+Os contratos são de primeira classe em `swarm/contracts.py`, e cada payload carrega o
+contrato inteiro. `tests/test_contracts.py` verifica que os cinco estão completos,
+que os gatilhos têm id e condição, que cada gatilho é avaliado com booleano e que as
+saídas profundas (estrutura de sessão, escadas, regras, red flags) existem.
 
 Os cinco são instanciados em `build_protocol()` e o resultado é serializável em JSON, o que permite testar, auditar e versionar.
 
@@ -64,7 +73,8 @@ perfil validado (schema estrito)
 
 | Eval | O que garante | Onde |
 |---|---|---|
-| Unidade do motor | gatilhos corretos por perfil | `tests/test_engine.py` (14 casos) |
+| Unidade do motor | gatilhos corretos por perfil | `tests/test_engine.py` |
+| Contratos | 5 contratos completos, gatilhos booleanos, saídas profundas | `tests/test_contracts.py` |
 | Paridade Python↔JS | app não diverge do motor auditável | `tests/test_parity.py` |
 | Resolução de referências | toda citação existe e tem URL | `test_every_reference_resolves_to_evidence` |
 | Rejeição de entrada | perfil incompleto/inválido falha alto | `test_missing_field_is_rejected`, `test_invalid_enum_is_rejected` |

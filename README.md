@@ -13,7 +13,7 @@ O que muda em relação ao material original:
   (`docs/SWARM_V3.md`).
 - **App funcional em pt-BR.** Treino de fala em ruído e resolução temporal com áudio real
   (Web Audio + voz pt-BR), e geração do protocolo offline no próprio aparelho.
-- **Testes.** 16 casos: motor, entrada inválida, resolução de citações e paridade Python↔JS.
+- **Testes.** 27 casos: motor, entrada inválida, resolução de citações e paridade Python↔JS.
 
 ## Estrutura
 
@@ -25,7 +25,7 @@ swarm/            motor determinístico (Python)
 app/
   index.html      estação de treino e triagem (pt-BR, áudio real)
   protocol.js     espelho do motor para rodar offline no navegador
-tests/            16 testes (pytest) incluindo paridade Python↔JS
+tests/            27 testes (pytest) incluindo paridade Python↔JS
 docs/             análise, arquitetura, evidências, protocolo, segurança
 ```
 

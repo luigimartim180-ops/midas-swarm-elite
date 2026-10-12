@@ -186,7 +186,7 @@
   <p class="foot" id="foot"></p>
 </main>
 
-<script src="protocol.js"></script>
+<script src="protocol.js?v=3"></script>
 <script>
 "use strict";
 
@@ -674,6 +674,11 @@ document.getElementById("toProfile").addEventListener("click", () => {
   setStep(5); show("s5");
 });
 
+function listBlock(title, items) {
+  if (!items || !items.length) return "";
+  return "<p style='margin:12px 0 4px'><strong>" + title + "</strong></p><ul>" + items.map(i => "<li>" + i + "</li>").join("") + "</ul>";
+}
+
 function readProfile() {
   const p = {};
   PROFILE_FIELDS.forEach(f => {
@@ -704,10 +709,17 @@ document.getElementById("buildProtocol").addEventListener("click", () => {
   protocol.agents.forEach(a => {
     const card = document.createElement("div");
     card.className = "card";
-    let html = "<h2>" + a.agent + "</h2><p style='color:var(--muted);margin:0 0 10px'>" + a.objective + "</p>";
+    try {
+    let html = "<h2>" + a.agent + "</h2>";
+    html += "<p style='color:var(--muted);margin:0 0 6px'>" + a.objective + "</p>";
+    html += "<p style='color:var(--muted);margin:0 0 10px;font-size:0.9rem'><em>" + a.rationale + "</em></p>";
+
+    const fired = (a.triggers || []).filter(t => t.fired).map(t => t.id).join(", ");
+    html += "<p style='font-size:0.85rem'><span class='badge'>gatilhos ativos: " + (fired || "nenhum") + "</span> <span class='badge'>parada: " + a.stop_criteria + "</span></p>";
+
     if (a.actions) {
       a.actions.forEach(act => {
-        html += "<div class='kv'><div><strong>" + act.action + "</strong><br><span style='color:var(--muted)'>" + act.detail + "</span></div></div>";
+        html += "<div class='kv'><div><strong>" + act.action + "</strong> <span class='badge'>P" + act.priority + " · " + act.effort + " · custo " + act.cost_band + "</span><br><span style='color:var(--muted)'>" + act.detail + "</span><br><span style='color:var(--accent);font-size:0.85rem'>efeito esperado: " + act.expected_effect + "</span></div></div>";
       });
     }
     if (a.micro_sessions_per_day) {
@@ -715,17 +727,41 @@ document.getElementById("buildProtocol").addEventListener("click", () => {
       html += "<div class='kv'><span>Minutos por sessão</span><span class='num'>" + a.minutes_per_session + "</span></div>";
       html += "<div class='kv'><span>Dias por semana</span><span class='num'>" + a.days_per_week + "</span></div>";
       html += "<div class='kv'><span>Platô esperado</span><span class='num'>" + a.expected_plateau_weeks + " semanas</span></div>";
+      html += listBlock("Estrutura da sessão", a.session_structure);
+      html += listBlock("Progressão", a.progression);
+      html += listBlock("Sinais de fadiga", a.fatigue_signs);
+      html += listBlock("Regras de parada", a.stop_rules);
+      html += "<p style='font-size:0.85rem;color:var(--muted)'>Adesão alvo: " + a.adherence_target + "</p>";
     }
     if (a.tv_ladder) {
       html += "<div class='kv'><span>Escada de TV</span><span>" + a.tv_ladder.map(t => TV_PT[t] || t).join(" → ") + "</span></div>";
+      html += listBlock("Alvos por degrau", a.tv_ladder.map(t => (TV_PT[t] || t) + ": " + (a.tv_targets[t] || "")));
+      html += listBlock("Escada de telefone", a.phone_ladder);
+      html += listBlock("Escada de conversa", a.conversation_ladder);
       html += "<div class='kv'><span>Música</span><span>" + a.music.minutes_per_session + " min, " + a.music.sessions_per_week + "x/semana</span></div>";
+      html += "<p style='font-size:0.85rem;color:var(--muted)'>" + a.generalisation_check + "</p>";
     }
-    if (a.rules) html += "<ul>" + a.rules.map(r => "<li>" + r + "</li>").join("") + "</ul>";
-    if (a.escalation_rules) html += "<ul>" + a.escalation_rules.map(r => "<li>" + r + "</li>").join("") + "</ul>";
-    if (a.flags && a.flags.length) {
-      html += "<div class='card warn'><strong>Alertas</strong><ul>" + a.flags.map(f => "<li>" + f.flag + ": " + f.action + "</li>").join("") + "</ul></div>";
+    if (a.do_rules) {
+      html += listBlock("Faça", a.do_rules);
+      html += listBlock("Não faça", a.dont_rules);
+      html += listBlock("Treino do parceiro (20 min)", a.training_session);
+      html += listBlock("Frases de reparo", a.repair_strategies);
+      html += listBlock("Ambiente", a.environment_checklist);
+    }
+    if (a.red_flags) {
+      html += listBlock("Sinais de alerta", a.red_flags.map(f => f.sign + " → " + f.target + " (" + f.urgency + ")"));
+      html += listBlock("Encaminhamentos", a.referral_targets);
+      html += listBlock("Contraindicações", a.contraindications);
+      html += "<p style='font-size:0.85rem;color:var(--muted)'>" + a.ceiling + "</p>";
+    }
+    if (a.evidence_gaps && a.evidence_gaps.length) {
+      html += listBlock("Lacunas de evidência (declaradas)", a.evidence_gaps);
     }
     card.innerHTML = html;
+    } catch (err) {
+      card.className = "card err";
+      card.textContent = a.agent + ": falha ao renderizar (" + err.message + ")";
+    }
     out.appendChild(card);
   });
 
