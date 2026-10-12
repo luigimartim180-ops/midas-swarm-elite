@@ -5,3 +5,6 @@ __pycache__/
 .agent_tmp/
 venv/
 .venv/
+
+browse.html
+app/browse.html
