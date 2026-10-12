@@ -105,6 +105,12 @@
   <h1>Estação de Treino Auditivo</h1>
   <p class="lead">Treino de fala em ruído e resolução temporal, em português do Brasil, para uso domiciliar acompanhado.</p>
 
+  <div class="card" id="releaseCard" style="border-left:4px solid var(--accent)">
+    <strong>SWARM v3 — build <span id="buildId">2026-10-12</span></strong>
+    <p style="margin:8px 0 0">5 agentes com contrato completo: <strong>A1 sinal</strong>, <strong>A2 dosagem</strong>, <strong>A3 transferência</strong>, <strong>A4 família</strong>, <strong>A5 segurança</strong>. Cada um declara gatilhos, saída, critério de parada e lacunas de evidência.</p>
+    <p style="margin:6px 0 0"><button id="quickProtocol" type="button">Ver os 5 agentes agora</button></p>
+  </div>
+
   <div class="steps" id="steps">
     <span class="step" data-step="0">1. Calibrar volume</span>
     <span class="step" data-step="1">2. Fala em ruído</span>
@@ -690,6 +696,12 @@ function readProfile() {
   });
   return p;
 }
+
+document.getElementById("quickProtocol").addEventListener("click", () => {
+  renderProfileForm();
+  setStep(5); show("s5");
+  document.getElementById("buildProtocol").click();
+});
 
 document.getElementById("buildProtocol").addEventListener("click", () => {
   const p = readProfile();
